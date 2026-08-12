@@ -45,6 +45,7 @@ public class TodoController {
         return new ResponseEntity<List<Todo>>(todoService.getAll(),HttpStatus.OK);
     }
 
+
     @PutMapping("/update")
     ResponseEntity<Todo> updateTodo(@RequestBody Todo todo){
         return new ResponseEntity<>(todoService.update(todo),HttpStatus.OK);
