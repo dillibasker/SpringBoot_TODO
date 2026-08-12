@@ -1,9 +1,9 @@
 package com.example.TODO;
 
 import com.example.TODO.models.Todo;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/todo")
 public class TodoController {
+
 
     @Autowired
     private TodoService todoService;
@@ -32,6 +33,11 @@ public class TodoController {
         }catch (RuntimeException exception){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/page")
+    ResponseEntity<Page<Todo>> getPageTodo(@RequestParam int page,@RequestParam int size){
+        return new ResponseEntity<>(todoService.getAllTodoByPage(page,size),HttpStatus.OK);
     }
 
     @GetMapping("/todos")

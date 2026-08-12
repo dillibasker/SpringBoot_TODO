@@ -1,10 +1,10 @@
 package com.example.TODO;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.example.TODO.models.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -35,5 +35,10 @@ public class TodoService
 
     public void deleTodo(Todo todo){
         todoRepository.delete(todo);
+    }
+
+    public Page<Todo> getAllTodoByPage(int page,int size){
+        Pageable pageable= PageRequest.of(page,size);
+        return todoRepository.findAll(pageable);
     }
 }
