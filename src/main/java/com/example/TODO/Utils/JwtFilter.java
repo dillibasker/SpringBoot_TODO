@@ -28,10 +28,12 @@ public class JwtFilter extends OncePerRequestFilter {
         if(authHeaders != null && authHeaders.startsWith("Bearer ")){
             String token=authHeaders.substring(7);
             if(jwtUtil.validateJwtToken(token)){
-                String email= jwtUtil.extremeEmail(token);
+                String email= jwtUtil.extractEmail(token);
                 var auth=new UsernamePasswordAuthenticationToken(email,null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
+
+        filterChain.doFilter(request, response);
     }
 }

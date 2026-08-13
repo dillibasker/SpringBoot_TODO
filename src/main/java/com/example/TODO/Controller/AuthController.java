@@ -20,10 +20,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    private PasswordEncoder passwordencoder;
-    private UserRepository userRepository;
-    private UserService userService;
+
+    private final PasswordEncoder passwordencoder;
+    private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Map<String,String> body){

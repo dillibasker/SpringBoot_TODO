@@ -27,18 +27,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extremeEmail(String token){
+    public String extractEmail(String token){
         return   Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
     public boolean validateJwtToken(String token){
         try{
-            extremeEmail(token);
+            extractEmail(token);
             return true;
         }catch (JwtException exception){
             return false;
