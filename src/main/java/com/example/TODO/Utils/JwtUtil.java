@@ -5,14 +5,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
+@Service
 public class JwtUtil {
-    private final String SECRET="";
+    private final String SECRET="kjweduiwgdiuweiefgiyewgfiuwfhwiu webihvfiyevfyewyidiuwee dqwkdgieygdiuqhduwqdui dqwiydgiqywgdiu";
     private final long EXPIRATION=1000*60;
     private final Key secretKey= Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
@@ -25,14 +27,18 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String extremeEmail(String token){
+        return   Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJwt(token)
+                .getBody()
+                .getSubject();
+    }
+
     public boolean validateJwtToken(String token){
         try{
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJwt(token)
-                    .getBody()
-                    .getSubject();
+            extremeEmail(token);
             return true;
         }catch (JwtException exception){
             return false;
