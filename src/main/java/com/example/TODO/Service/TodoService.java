@@ -27,11 +27,21 @@ public class TodoService
         return todoRepository.findAll();
     }
     public Todo update(Todo todo){
+        Todo existingTodo = todoRepository.findById(todo.getId())
+                .orElseThrow(() -> new RuntimeException("Todo not found"));
+
+        existingTodo.setTitle(todo.getTitle());
+        existingTodo.setDescription(todo.getDescription());
+        existingTodo.setIsCompleted(todo.getIsCompleted());
+
         return todoRepository.save(todo);
     }
 
     public void deleteByID(Long id){
-        todoRepository.delete(getTodoById(id));
+        Todo existingTodo = todoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Todo not found"));
+
+        todoRepository.delete(existingTodo);
     }
 
     public void deleTodo(Todo todo){
