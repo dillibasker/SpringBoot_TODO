@@ -1,11 +1,14 @@
 package com.example.TODO.Controller;
 
+import com.example.TODO.Repository.UserRepository;
 import com.example.TODO.Service.TodoService;
 import com.example.TODO.models.Todo;
-import org.springframework.data.domain.Page;
+import com.example.TODO.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,46 +17,126 @@ import java.util.List;
 @RequestMapping("/api/v1/todo")
 public class TodoController {
 
-
     @Autowired
     private TodoService todoService;
-    @GetMapping("/get")
-    String getTodo(){
-        return "todo";
-    }
-    @PostMapping("/create")
-    ResponseEntity<Todo> createUser(@RequestBody Todo todo){
-        return new ResponseEntity<>(todoService.createTodo(todo), HttpStatus.CREATED);
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    private User getLoggedInUser(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+
+    @GetMapping("/get")
+    public String getTodo() {
+        return "todo";
+    }
+
+
+    @PostMapping("/create")
+    public ResponseEntity<Todo> createTodo(
+            @RequestBody Todo todo,
+            Authentication authentication
+    ) {
+
+        User user = getLoggedInUser(authentication);
+
+        Todo createdTodo = todoService.createTodo(todo, user);
+
+        return new ResponseEntity<>(
+                createdTodo,
+                HttpStatus.CREATED
+        );
+    }
+
+
     @GetMapping("/{id}")
-    ResponseEntity<Todo> getTodoById(@PathVariable long id){
+    public ResponseEntity<Todo> getTodoById(
+            @PathVariable long id,
+            Authentication authentication
+    ) {
+
         try {
-            Todo Created = todoService.getTodoById(id);
-            return new ResponseEntity<>(Created, HttpStatus.OK);
-        }catch (RuntimeException exception){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            User user = getLoggedInUser(authentication);
+
+            Todo todo = todoService.getTodoById(id, user);
+
+            return new ResponseEntity<>(
+                    todo,
+                    HttpStatus.OK
+            );
+
+        } catch (RuntimeException exception) {
+
+            return new ResponseEntity<>(
+                    HttpStatus.NOT_FOUND
+            );
         }
     }
 
+
     @GetMapping("/page")
-    ResponseEntity<Page<Todo>> getPageTodo(@RequestParam int page,@RequestParam int size){
-        return new ResponseEntity<>(todoService.getAllTodoByPage(page,size),HttpStatus.OK);
+    public ResponseEntity<Page<Todo>> getPageTodo(
+            @RequestParam int page,
+            @RequestParam int size,
+            Authentication authentication
+    ) {
+
+        User user = getLoggedInUser(authentication);
+
+        return new ResponseEntity<>(
+                todoService.getAllTodoByPage(page, size, user),
+                HttpStatus.OK
+        );
     }
 
+
     @GetMapping("/todos")
-    ResponseEntity<List<Todo>> getTodos(){
-        return new ResponseEntity<List<Todo>>(todoService.getAll(),HttpStatus.OK);
+    public ResponseEntity<List<Todo>> getTodos(
+            Authentication authentication
+    ) {
+
+        User user = getLoggedInUser(authentication);
+
+        return new ResponseEntity<>(
+                todoService.getAll(user),
+                HttpStatus.OK
+        );
     }
 
 
     @PutMapping("/update")
-    ResponseEntity<Todo> updateTodo(@RequestBody Todo todo){
-        return new ResponseEntity<>(todoService.update(todo),HttpStatus.OK);
+    public ResponseEntity<Todo> updateTodo(
+            @RequestBody Todo todo,
+            Authentication authentication
+    ) {
+
+        User user = getLoggedInUser(authentication);
+
+        return new ResponseEntity<>(
+                todoService.update(todo, user),
+                HttpStatus.OK
+        );
     }
 
+
     @DeleteMapping("/{id}")
-    void deleteTodoByID(@PathVariable long id){
-        todoService.deleteByID(id);
+    public ResponseEntity<Void> deleteTodoByID(
+            @PathVariable long id,
+            Authentication authentication
+    ) {
+
+        User user = getLoggedInUser(authentication);
+
+        todoService.deleteByID(id, user);
+
+        return ResponseEntity.noContent().build();
     }
 }
